@@ -1,12 +1,9 @@
-# git https://github.com/kaiser-data/PDF_OCR_with_Tesseract.git
-
 from pdf2image import convert_from_path
-from PIL import Image
 import pytesseract
 import os
 
 # Path to tesseract executable (Optional, required if not in PATH)
-pytesseract.pytesseract.tesseract_cmd = '/usr/local/bin/tesseract'  # Update if necessary
+pytesseract.pytesseract.tesseract_cmd = '/opt/homebrew/bin/tesseract'  # Update if necessary
 
 
 def pdf_to_text(pdf_path, output_folder='output_images', dpi=300):
@@ -25,7 +22,12 @@ def pdf_to_text(pdf_path, output_folder='output_images', dpi=300):
             image.save(image_path, 'PNG')
 
             # OCR on each image
-            text = pytesseract.image_to_string(image)
+            custom_config = r'--psm 6 -l deu --oem 1'  # Ensure OCR Engine 1 (LSTM)
+            text = pytesseract.image_to_string(image, config=custom_config)
+
+            # Optional: Force UTF-8 encoding
+            text = text.encode('utf-8').decode('utf-8')
+
             extracted_text += text + "\n\n"
 
             print(f"Page {i + 1} done...")
@@ -40,7 +42,6 @@ def pdf_to_text(pdf_path, output_folder='output_images', dpi=300):
         print(f"Error: {e}")
 
 
-
 if __name__ == "__main__":
-    pdf_path = 'path_to_your_pdf/document.pdf'  # Replace with your PDF path
+    pdf_path = 'AZ_MK.pdf'
     pdf_to_text(pdf_path)
